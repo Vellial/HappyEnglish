@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "ru.lightside.relaxpaint"
+    namespace = "ru.lightside.happyenglish"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "ru.lightside.relaxpaint"
+        applicationId = "ru.lightside.happyenglish"
         minSdk = 33
         targetSdk = 33
         versionCode = 1

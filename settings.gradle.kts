@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "RelaxPaint"
+rootProject.name = "HappyEnglish"
 include(":app")
