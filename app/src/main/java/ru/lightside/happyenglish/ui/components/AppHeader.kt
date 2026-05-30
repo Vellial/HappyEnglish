@@ -25,13 +25,13 @@ fun AppHeader() {
             text = "Happy English",
             fontSize = 28.sp,
             color = Pink40,
-            fontFamily = FontFamily(Font(R.font.farabee_regular))
+            fontFamily = FontFamily(Font(R.font.farabee_medium))
         )
         Text(
             text = "Учим английские слова",
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             color = Purple40,
-            fontFamily = FontFamily(Font(R.font.jun_regular))
+            fontFamily = FontFamily(Font(R.font.farabee_regular))
         )
     }
 }

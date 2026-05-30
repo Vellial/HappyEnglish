@@ -26,7 +26,7 @@ object GameLevels {
             id = 3,
             name = "Эксперт",
             wordCount = 15,
-            timeLimitSeconds = 60,
+            timeLimitSeconds = 120,
             requiredAccuracy = 0.7f,
             coinsReward = 50,
             xpReward = 200
@@ -35,7 +35,7 @@ object GameLevels {
             id = 4,
             name = "Мастер",
             wordCount = 20,
-            timeLimitSeconds = 60,
+            timeLimitSeconds = 150,
             requiredAccuracy = 0.8f,
             coinsReward = 100,
             xpReward = 500
@@ -44,7 +44,7 @@ object GameLevels {
             id = 5,
             name = "Легенда",
             wordCount = 25,
-            timeLimitSeconds = 45,
+            timeLimitSeconds = 180,
             requiredAccuracy = 0.9f,
             coinsReward = 200,
             xpReward = 1000

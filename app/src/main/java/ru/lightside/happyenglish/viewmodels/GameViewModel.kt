@@ -27,7 +27,7 @@ class GameViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        private const val MAX_VISIBLE_PAIRS = 6
+        private const val MAX_VISIBLE_PAIRS = 8
     }
 
     // Добавляем состояние для угаданных пар
@@ -59,6 +59,9 @@ class GameViewModel @Inject constructor(
     private var levelPool = mutableListOf<WordPair>()
 
     // Новые поля для уровней и наград
+    private val _isTrainingMode = MutableStateFlow(true)
+    val isTrainingMode = _isTrainingMode.asStateFlow()
+
     private val _currentLevel = MutableStateFlow(1)
     val currentLevel = _currentLevel.asStateFlow()
 
@@ -85,7 +88,7 @@ class GameViewModel @Inject constructor(
         viewModelScope.launch {
             wordPairs.collect { pairs ->
                 if (pairs.isNotEmpty() && _gameState.value == GameState.Idle) {
-                    startLevel(pairs)
+                    startTraining(pairs)
                 }
             }
         }
@@ -108,6 +111,7 @@ class GameViewModel @Inject constructor(
         matchedIds = emptySet()
         sessionCorrectAnswers = 0
         sessionTotalAttempts = 0
+        _isTrainingMode.value = false
         _gameState.value = GameState.Playing
         
         startTimer()
@@ -133,8 +137,39 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    private fun startTraining(allPairs: List<WordPair>) {
+        totalPairsInLevel = allPairs.size
+        levelPool = allPairs.toMutableList()
+
+        val initialVisible = levelPool.take(MAX_VISIBLE_PAIRS)
+        levelPool.removeAll(initialVisible)
+
+        _shuffledOriginals.value = initialVisible.shuffled()
+        _shuffledTranslations.value = initialVisible.shuffled()
+
+        matchedIds = emptySet()
+        sessionCorrectAnswers = 0
+        sessionTotalAttempts = 0
+        _isTrainingMode.value = true
+        _gameState.value = GameState.Playing
+        _timer.value = 0
+    }
+
+    fun switchToGame() {
+        _isTrainingMode.value = false
+        _currentLevel.value = 1
+        val pairs = wordPairs.value
+        if (pairs.isNotEmpty()) {
+            startLevel(pairs)
+        }
+    }
+
     private fun startTimer() {
         timerJob?.cancel()
+        if (_isTrainingMode.value) {
+            _timer.value = 0
+            return
+        }
         val limit = currentLevelData.timeLimitSeconds
         if (limit != null) {
             _timer.value = limit
@@ -154,6 +189,11 @@ class GameViewModel @Inject constructor(
 
     private fun onLevelFailed() {
         _gameState.value = GameState.LevelFailed
+    }
+
+    private fun onTrainingCompleted() {
+        timerJob?.cancel()
+        _gameState.value = GameState.Finished
     }
 
     private fun onLevelCompleted() {
@@ -241,7 +281,11 @@ class GameViewModel @Inject constructor(
                 refillActiveWords()
                 
                 if (matchedIds.size == totalPairsInLevel) {
-                    onLevelCompleted()
+                    if (_isTrainingMode.value) {
+                        onTrainingCompleted()
+                    } else {
+                        onLevelCompleted()
+                    }
                 }
             } else {
                 errorIds = setOf(original, translation)
@@ -257,18 +301,6 @@ class GameViewModel @Inject constructor(
 
             selectedOriginalId = null
             selectedTranslationId = null
-        }
-    }
-
-    private fun loadWordsForReview() {
-        viewModelScope.launch {
-            val wordsForReview = repository.getWordsForReview(10)
-            if (wordsForReview.isNotEmpty()) {
-                _shuffledOriginals.value = wordsForReview.shuffled()
-                _shuffledTranslations.value = wordsForReview.shuffled()
-            } else {
-                // Все слова повторены — можно предложить добавить новые
-            }
         }
     }
 

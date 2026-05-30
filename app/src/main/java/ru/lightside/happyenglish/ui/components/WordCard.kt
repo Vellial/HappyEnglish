@@ -45,7 +45,7 @@ fun WordCard(
 
     Card(
         modifier = modifier
-            .height(80.dp)
+            .height(60.dp)
             .fillMaxWidth()
             .shake(isError)
             .padding(4.dp),

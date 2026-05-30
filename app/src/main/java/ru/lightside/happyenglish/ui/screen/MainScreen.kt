@@ -13,12 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import ru.lightside.happyenglish.ui.components.AppHeader
 import ru.lightside.happyenglish.ui.components.MainNavButtons
 import ru.lightside.happyenglish.ui.theme.Purple80
+import ru.lightside.happyenglish.viewmodels.GameViewModel
 
 @Composable
-fun MainScreen(onNavigateToAddWord: () -> Unit) {
+fun MainScreen(
+    onNavigateToAddWord: () -> Unit,
+    viewModel: GameViewModel = hiltViewModel()
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Purple80
@@ -26,20 +31,21 @@ fun MainScreen(onNavigateToAddWord: () -> Unit) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 24.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.Top
         ) {
             AppHeader()
 
-            // Здесь теперь GameScreen, который берет на себя игровую логику
-            Box(modifier = Modifier.weight(1f).fillMaxWidth().padding(16.dp)) {
-                GameScreen()
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                GameScreen(onNavigateToAddWord = onNavigateToAddWord, viewModel = viewModel)
             }
-
-            Spacer(modifier = Modifier.height(30.dp))
-            MainNavButtons(onNavigateToAddWord = onNavigateToAddWord)
+            Spacer(modifier = Modifier.height(12.dp))
+            MainNavButtons(
+                onNavigateToAddWord = onNavigateToAddWord,
+                onStartGame = { viewModel.switchToGame() }
+            )
         }
     }
 }
